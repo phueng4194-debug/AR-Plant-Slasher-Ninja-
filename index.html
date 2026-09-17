@@ -1438,7 +1438,7 @@ canvas {
         });
 
         window.addEventListener('mousemove', (e) => {
-          if (!this.isMouseDown && !this.cameraActive) return;
+          if (!this.isMouseDown) return;
           const rect = this.canvas.getBoundingClientRect();
           const currentPos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 
