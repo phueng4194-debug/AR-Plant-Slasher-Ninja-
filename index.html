@@ -1428,7 +1428,7 @@ canvas {
 
       setupEventListeners() {
         // Mouse Listeners
-        this.canvas.addEventListener('mousedown', (e) => {
+        window.addEventListener('mousedown', (e) => {
           this.isMouseDown = true;
           const rect = this.canvas.getBoundingClientRect();
           const pos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
