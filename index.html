@@ -156,6 +156,16 @@
       color: #ffffff;
       border-color: #38bdf8;
     }
+    /* ป้องกันหน้าจอเกมบังปุ่มกด */
+canvas {
+  pointer-events: none !important;
+}
+.header, .top-bar, button, #btnAR, #btnPause, .action-btn {
+  position: relative !important;
+  z-index: 999999 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
   </style>
 </head>
 <body class="relative w-screen h-screen overflow-hidden bg-slate-950 select-none">
