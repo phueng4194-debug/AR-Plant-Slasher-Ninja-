@@ -160,14 +160,12 @@
 </head>
 <body class="relative w-screen h-screen overflow-hidden bg-slate-950 select-none">
 
-  <!-- Hidden WebCam Video Stream -->
-  <video id="webcam-video" class="hidden" playsinline autoplay muted></video>
-
   <!-- Viewport Elements -->
   <div id="game-container" class="relative w-full h-full overflow-hidden">
     <!-- Decal Canvas (Background Splatters) -->
     <canvas id="decal-canvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
-
+    <!-- WebCam Background Video Stream -->
+    <video id="webcam-video" class="absolute inset-0 w-full h-full object-cover -scale-x-100 opacity-50 z-0 pointer-events-none hidden" playsinline autoplay muted></video>
     <!-- Main Game Physics & Render Canvas -->
     <canvas id="game-canvas" class="absolute inset-0 w-full h-full z-10 cursor-crosshair"></canvas>
 
@@ -1481,8 +1479,10 @@
         this.bladePoints.push({ x, y, life: 1.0, isAR });
       },
 
-      async toggleCamera() {
+     async toggleCamera() {
         const btn = document.getElementById('ar-status-text');
+        const videoElement = document.getElementById('webcam-video');
+
         if (this.cameraActive) {
           this.stopCamera();
           btn.textContent = "เปิดกล้อง AR";
@@ -1490,9 +1490,8 @@
           return;
         }
 
-        btn.textContent = "เชื่อมต่อกล้อง...";
+        btn.textContent = "กำลังเปิดกล้อง...";
         try {
-          const videoElement = document.getElementById('webcam-video');
           if (!this.hands) {
             this.hands = new Hands({
               locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
@@ -1508,39 +1507,49 @@
             this.hands.onResults((results) => this.onHandResults(results));
           }
 
+          // แสดงภาพวิดีโอจากกล้องขึ้นมาบนฉากหลัง
+          videoElement.classList.remove('hidden');
+
           this.camera = new Camera(videoElement, {
             onFrame: async () => {
               if (this.cameraActive) {
                 await this.hands.send({ image: videoElement });
               }
             },
-            width: 640,
-            height: 480
+            width: 1280,
+            height: 720
           });
 
           await this.camera.start();
           this.cameraActive = true;
           btn.textContent = "ปิดกล้อง AR";
-          this.showToast("เปิดกล้อง AR สำเร็จ! ใช้นิ้วชี้ฟันดาบ & จีบนิ้วเพื่อคลิกปุ่ม");
+          this.showToast("เปิดกล้อง AR สำเร็จ! ใช้นิ้วชี้หรือเมาส์ฟันได้เลย");
         } catch (err) {
           console.error("Camera error:", err);
           this.cameraActive = false;
+          videoElement.classList.add('hidden');
           btn.textContent = "เปิดกล้อง AR";
-          this.showToast("ไม่สามารถเข้าถึงกล้องได้: เล่นด้วยเมาส์/ทัชสกรีนได้ทันที");
+          this.showToast("ไม่สามารถเข้าถึงกล้องได้: ตรวจสอบสิทธิ์การอนุญาตใช้กล้อง");
         }
       },
 
       stopCamera() {
+        const videoElement = document.getElementById('webcam-video');
         if (this.camera) {
           try { this.camera.stop(); } catch (e) {}
+        }
+        if (videoElement && videoElement.srcObject) {
+          const tracks = videoElement.srcObject.getTracks();
+          tracks.forEach(track => track.stop());
+          videoElement.srcObject = null;
+        }
+        if (videoElement) {
+          videoElement.classList.add('hidden');
         }
         this.cameraActive = false;
         this.arCtx.clearRect(0, 0, this.width, this.height);
         document.getElementById('virtual-cursor').classList.add('hidden');
       },
-
-      onHandResults(results) {
-        this.arCtx.clearRect(0, 0, this.width, this.height);
 
         if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
           this.lastIndexPos = null;
