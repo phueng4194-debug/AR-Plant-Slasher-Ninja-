@@ -1427,20 +1427,18 @@
           this.sound.playSwoosh();
         });
 
+        });
         window.addEventListener('mousemove', (e) => {
-          if (!this.isMouseDown && !this.cameraActive) return;
+          if (!this.isMouseDown) return;
           const rect = this.canvas.getBoundingClientRect();
           const currentPos = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 
-          if (this.isMouseDown) {
-            this.addBladePoint(currentPos.x, currentPos.y, false);
-            if (this.lastMousePos) {
-              this.checkSlashIntersection(this.lastMousePos, currentPos);
-            }
-            this.lastMousePos = currentPos;
+          this.addBladePoint(currentPos.x, currentPos.y, false);
+          if (this.lastMousePos) {
+            this.checkSlashIntersection(this.lastMousePos, currentPos);
           }
+          this.lastMousePos = currentPos;
         });
-
         window.addEventListener('mouseup', () => {
           this.isMouseDown = false;
           this.lastMousePos = null;
