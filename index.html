@@ -1512,7 +1512,7 @@ canvas {
 
             this.hands.setOptions({
               maxNumHands: 1,
-              modelComplexity: 1,
+              modelComplexity: 0,  
               minDetectionConfidence: 0.55,
               minTrackingConfidence: 0.55
             });
@@ -1681,9 +1681,9 @@ canvas {
       },
 
       setupLevelParameters() {
-        this.speedFactor = 1.0 + ((this.level - 1) * 0.05);
-        this.gravityCurrent = 0.18 + ((this.level - 1) * 0.012);
-        this.spawnInterval = Math.max(65, 120 - ((this.level - 1) * 3));
+        this.speedFactor = 1.2 + ((this.level - 1) * 0.06);
+        this.gravityCurrent = 0.28 + ((this.level - 1) * 0.015);
+        this.spawnInterval = Math.max(50, 95 - ((this.level - 1) * 3));
 
         const configIndex = (this.level - 1) % LEVEL_CONFIGS.length;
         this.currentMission = { ...LEVEL_CONFIGS[configIndex] };
